@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
 const { check, validationResult } = require('express-validator');
+const request = require('request');
+const config = require('config');
 
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
@@ -151,14 +153,14 @@ router.get('/user/:user_id', async (req, res) => {
 		}).populate('user', ['name', 'avatar']);
 
 		if (!profile) {
-			return res.status(400).json({ msg: 'Profile not found' });
+			return res.status(404).json({ msg: 'Profile not found' });
 		}
 
 		res.json(profile);
 	} catch (err) {
 		console.error(err.message);
 
-		if ((err.kind = 'ObjectId')) {
+		if (err.message.indexOf('Cast to ObjectId failed') !== -1) {
 			return res.status(400).json({ msg: 'Profile not found' });
 		}
 
@@ -171,13 +173,14 @@ router.get('/user/:user_id', async (req, res) => {
 //* @access  Private
 router.delete('/', auth, async (req, res) => {
 	try {
-		// todo - Remove user posts
-
 		// Remove Profile
 		await Profile.findOneAndRemove({ user: req.user.id });
 
 		// Remove User
 		await User.findOneAndRemove({ _id: req.user.id });
+
+		// Remove user posts
+		await Post.findOneAndRemove({ user: req.user.id });
 
 		res.json({ msg: 'User deleted' });
 	} catch (err) {
@@ -263,10 +266,10 @@ router.delete('/experience/:exp_id', auth, async (req, res) => {
 	}
 });
 
-//* @route   PUT api/profile/experience/:exp_id
-//* @desc    Update experience from profile
+//* @route   PATCH api/profile/experience/:exp_id
+//* @desc    Update profile experience
 //* @access  Private
-router.put(
+router.patch(
 	'/experience/:exp_id',
 	[
 		auth,
@@ -310,11 +313,15 @@ router.put(
 					current,
 					description,
 				};
-				await profile.save();
-				return res.json(profile);
+				const updatedExp = await profile.save();
+				return res.json(updatedExp);
 			}
 		} catch (err) {
 			console.error(err.message);
+
+			if (err.message.indexOf('Cast to ObjectId failed') !== -1) {
+				return res.status(400).json({ msg: 'Experience not found' });
+			}
 
 			res.status(500).send('Server Error');
 		}
@@ -331,6 +338,7 @@ router.put(
 		[
 			check('school', 'School is required').not().isEmpty(),
 			check('degree', 'Degree is required').not().isEmpty(),
+			check('fieldofstudy', 'Field of study is required').not().isEmpty(),
 			check('from', 'From date is required').not().isEmpty(),
 		],
 	],
@@ -398,16 +406,17 @@ router.delete('/education/:edu_id', auth, async (req, res) => {
 	}
 });
 
-//* @route   PUT api/profile/education/:edu_id
+//* @route   PATCH api/profile/education/:edu_id
 //* @desc    Update education from profile
 //* @access  Private
-router.put(
+router.patch(
 	'/education/:edu_id',
 	[
 		auth,
 		[
 			check('school', 'School is required').not().isEmpty(),
 			check('degree', 'Degree is required').not().isEmpty(),
+			check('fieldofstudy', 'Field of study is required').not().isEmpty(),
 			check('from', 'From date is required').not().isEmpty(),
 		],
 	],
@@ -451,9 +460,43 @@ router.put(
 		} catch (err) {
 			console.error(err.message);
 
+			if (err.message.indexOf('Cast to ObjectId failed') !== -1) {
+				return res.status(400).json({ msg: 'Experience not found' });
+			}
+
 			res.status(500).send('Server Error');
 		}
 	}
 );
+
+//* @route   GET api/profile/github/:username
+//* @desc    Get user repos from github
+//* @access  Public
+router.get('/github/:username', (req, res) => {
+	try {
+		const options = {
+			uri: `https://api.github.com/users/${
+				req.params.username
+			}/repos?per_page=5&sort=created:asc&client_id=${config.get(
+				'githubClientId'
+			)}&client_secret${config.get('githubClientSecret')}`,
+			method: 'GET',
+			headers: { 'user-agent': 'node.js' },
+		};
+
+		request(options, (error, response, body) => {
+			if (error) console.error(error);
+
+			if (response.statusCode !== 200) {
+				return res.status(404).json({ msg: 'No github profile not found' });
+			}
+
+			res.json(JSON.parse(body));
+		});
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).send('Server Error');
+	}
+});
 
 module.exports = router;

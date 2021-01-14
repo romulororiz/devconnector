@@ -1,4 +1,6 @@
 {
     "mongoURI": "mongodb+srv://romulororiz:romulo150293@devconnector.d7nqh.mongodb.net/DevConnector?retryWrites=true&w=majority",
-    "jwtSecret": "mysecrettoken" 
+    "jwtSecret": "mysecrettoken",
+    "githubClientId": "115c24ac770b5f32d0de",
+    "githubClientSecret": "156897ed2415e3225e4900cfe353b46c3863d34e"
 }
