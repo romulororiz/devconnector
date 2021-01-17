@@ -1,8 +1,14 @@
 import React, { Fragment, useState } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { Link, Redirect } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAlert } from '../../actions/alert';
+import { register } from '../../actions/auth';
 
 const Register = () => {
+	const dispatch = useDispatch();
+
+	const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+
 	const [formData, setFormData] = useState({
 		name: '',
 		email: '',
@@ -14,34 +20,21 @@ const Register = () => {
 
 	const onChange = e => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
-		console.log(e.target.name, e.target.value);
 	};
 
 	const onSubmit = async e => {
 		e.preventDefault();
 		if (password !== password2) {
-			console.log('Passwords do not match');
+			dispatch(setAlert('Passwords do not match', 'danger'));
 		} else {
-			const newUser = {
-				name,
-				email,
-				password,
-			};
-
-			try {
-				const config = {
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				};
-				const body = JSON.stringify(newUser);
-				const res = await axios.post('/api/users', body, config);
-				console.log(res.data);
-			} catch (err) {
-				console.error(err.response.data);
-			}
+			dispatch(register({ name, email, password }));
 		}
 	};
+
+	// Redirect if register success
+	if (isAuthenticated) {
+		return <Redirect to='/dashboard' />;
+	}
 
 	return (
 		<Fragment>
