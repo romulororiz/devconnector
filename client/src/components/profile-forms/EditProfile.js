@@ -1,11 +1,13 @@
-import React, { Fragment, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { Fragment, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
-import { createProfile } from '../../actions/profile';
+import { createProfile, getCurrentUserProfile } from '../../actions/profile';
 
-const CreateProfile = () => {
+const EditProfile = () => {
 	const dispatch = useDispatch();
 	const history = useHistory();
+
+	const { profile, loading } = useSelector(state => state.profile);
 
 	const [formData, setFormData] = useState({
 		company: '',
@@ -23,6 +25,27 @@ const CreateProfile = () => {
 	});
 
 	const [displaySocialLinks, setDisplaySocialLinks] = useState(false);
+
+	useEffect(() => {
+		dispatch(getCurrentUserProfile());
+
+		setFormData({
+			company: loading || !profile.company ? '' : profile.company,
+			website: loading || !profile.website ? '' : profile.website,
+			location: loading || !profile.location ? '' : profile.location,
+			status: loading || !profile.status ? '' : profile.status,
+			skills: loading || !profile.skills ? '' : profile.skills.join(','),
+			bio: loading || !profile.bio ? '' : profile.bio,
+			githubusername:
+				loading || !profile.githubusername ? '' : profile.githubusername,
+			youtube: loading || !profile.youtube ? '' : profile.youtube,
+			twitter: loading || !profile.twitter ? '' : profile.twitter,
+			facebook: loading || !profile.facebook ? '' : profile.facebook,
+			linkedin: loading || !profile.linkedin ? '' : profile.linkedin,
+			instagram: loading || !profile.instagram ? '' : profile.instagram,
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [loading]);
 
 	const {
 		company,
@@ -45,17 +68,17 @@ const CreateProfile = () => {
 
 	const submitHandler = e => {
 		e.preventDefault();
-		dispatch(createProfile(formData, history));
+		dispatch(createProfile(formData, history, true));
 	};
 
 	return (
 		<Fragment>
-			<h1 className='large text-primary'>Create Your Profile</h1>
+			<h1 className='large text-primary'>Edit Your Profile</h1>
 			<p className='lead'>
-				<i className='fas fa-user'></i> Let's get some information to make your
-				profile stand out
+				<i className='fas fa-user'></i> Edit your info here
 			</p>
 			<small>* = required field</small>
+
 			<form className='form' onSubmit={submitHandler}>
 				<div className='form-group'>
 					<select name='status' value={status} onChange={formDataHandler}>
@@ -215,7 +238,7 @@ const CreateProfile = () => {
 				<input
 					type='submit'
 					className='btn btn-primary my-1'
-					value='Create profile'
+					value='Edit profile'
 				/>
 				<Link className='btn btn-light my-1' to='/dashboard'>
 					Go Back
@@ -225,4 +248,4 @@ const CreateProfile = () => {
 	);
 };
 
-export default CreateProfile;
+export default EditProfile;
