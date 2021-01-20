@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCurrentUserProfile } from '../../actions/profile';
+import { deleteAccount, getCurrentUserProfile } from '../../actions/profile';
 import { DashboardActions } from './DashboardActions';
 import Experience from '../dashboard/Experience';
 import Education from './Education';
@@ -28,8 +28,14 @@ const Dashboard = () => {
 			{profile !== null ? (
 				<Fragment>
 					<DashboardActions />
-					<Experience experience={profile.experience}/>
-					<Education education={profile.education}/>
+					<Experience experience={profile.experience} />
+					<Education education={profile.education} />
+
+					<div className='my-2' onClick={() => dispatch(deleteAccount())}>
+						<button className='btn btn-danger'>
+							<i className='fas fa-user-minus'></i> Delete my account
+						</button>
+					</div>
 				</Fragment>
 			) : (
 				<Fragment>

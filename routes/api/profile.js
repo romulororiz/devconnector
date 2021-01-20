@@ -180,7 +180,7 @@ router.delete('/', auth, async (req, res) => {
 		await User.findOneAndRemove({ _id: req.user.id });
 
 		// Remove user posts
-		await Post.findOneAndRemove({ user: req.user.id });
+		await Post.deleteMany({ user: req.user.id });
 
 		res.json({ msg: 'User deleted' });
 	} catch (err) {

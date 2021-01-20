@@ -74,6 +74,10 @@ img {
 	color: var(--dark-color);
 }
 
+.text-light {
+	color: var(--light-color);
+}
+
 /* Padding */
 .p {
 	padding: 0.5rem;
