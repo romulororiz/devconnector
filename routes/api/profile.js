@@ -68,7 +68,9 @@ router.post(
 			profileFields.company = company;
 		}
 		if (website) {
-			profileFields.website = website;
+			if (website.includes('http://') || website.includes('https://'))
+				profileFields.website = website;
+			else profileFields.website = `http://${website}`;
 		}
 		if (location) {
 			profileFields.location = location;
@@ -89,19 +91,29 @@ router.post(
 		// Build Social object
 		profileFields.social = {};
 		if (youtube) {
-			profileFields.social.youtube = youtube;
+			if (youtube.includes('http://') || youtube.includes('https://'))
+				profileFields.social.youtube = youtube;
+			else profileFields.social.youtube = `http://${youtube}`;
 		}
 		if (facebook) {
-			profileFields.social.facebook = facebook;
+			if (facebook.includes('http://') || facebook.includes('https://'))
+				profileFields.social.facebook = facebook;
+			else profileFields.social.facebook = `http://${facebook}`;
 		}
 		if (linkedin) {
-			profileFields.social.linkedin = linkedin;
+			if (linkedin.includes('http://') || linkedin.includes('https://'))
+				profileFields.social.linkedin = linkedin;
+			else profileFields.social.linkedin = `http://${linkedin}`;
 		}
 		if (instagram) {
-			profileFields.social.instagram = instagram;
+			if (instagram.includes('http://') || instagram.includes('https://'))
+				profileFields.social.instagram = instagram;
+			else profileFields.social.instagram = `http://${instagram}`;
 		}
 		if (twitter) {
-			profileFields.social.twitter = twitter;
+			if (twitter.includes('http://') || twitter.includes('https://'))
+				twitter.social.twitter = twitter;
+			else profileFields.social.twitter = `http://${twitter}`;
 		}
 
 		try {

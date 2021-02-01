@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import { useDispatch } from 'react-redux';
 import Moment from 'react-moment';
 import { deleteExperience } from '../../actions/profile';
+import PropTypes from 'prop-types';
 
 const Experience = ({ experience }) => {
 	const dispatch = useDispatch();
@@ -49,6 +50,10 @@ const Experience = ({ experience }) => {
 			)}
 		</Fragment>
 	);
+};
+
+Experience.propTypes = {
+	experience: PropTypes.array.isRequired,
 };
 
 export default Experience;

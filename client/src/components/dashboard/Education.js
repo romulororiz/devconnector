@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import { useDispatch } from 'react-redux';
 import Moment from 'react-moment';
 import { deleteEducation } from '../../actions/profile';
+import PropTypes from 'prop-types';
 
 const Education = ({ education }) => {
 	const dispatch = useDispatch();
@@ -35,7 +36,6 @@ const Education = ({ education }) => {
 			<h2 className='my-2'>Education Credentials</h2>
 			{!education.length ? (
 				<h4>You still haven't added any education</h4>
-
 			) : (
 				<table className='table'>
 					<thead>
@@ -52,6 +52,10 @@ const Education = ({ education }) => {
 			)}
 		</Fragment>
 	);
+};
+
+Education.propTypes = {
+	education: PropTypes.array.isRequired,
 };
 
 export default Education;
